@@ -1,0 +1,374 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using TravelAgency_Secure.Data;
+using TravelAgency_Secure.Filters;
+using TravelAgency_Secure.Models;
+using TravelAgency_Secure.Services;
+
+
+namespace TravelAgency_Secure.Controllers
+{
+    [AdminOnly]
+    public class AdminTripsController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly EmailService _emailService;
+
+
+        public AdminTripsController(ApplicationDbContext context, EmailService emailService)
+        {
+            _context = context;
+            _emailService = emailService;
+
+        }
+
+        public IActionResult Index()
+        {
+            var trips = _context.Trips.ToList();
+            return View(trips);
+        }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Trip trip)
+        {
+            // 🗓 תאריכי טיול
+            if (trip.StartDate < DateTime.Today)
+            {
+                ModelState.AddModelError("", "Trip start date cannot be in the past.");
+            }
+
+            if (trip.StartDate >= trip.EndDate)
+            {
+                ModelState.AddModelError("", "Start date must be before end date.");
+            }
+
+            // 💰 מחיר
+            if (trip.Price <= 0)
+            {
+                ModelState.AddModelError("", "Price must be greater than zero.");
+            }
+
+            // 🏨 חדרים
+            if (trip.AvailableRooms <= 0)
+            {
+                ModelState.AddModelError("", "Available rooms must be greater than zero.");
+            }
+
+            // 🎂 גיל
+            if (trip.AgeLimit < 0)
+            {
+                ModelState.AddModelError("", "Age limit cannot be negative.");
+            }
+
+            // ❌ תאריך הנחה בלי מחיר
+            if (trip.DiscountPrice == null && trip.DiscountEndDate != null)
+            {
+                ModelState.AddModelError("",
+                    "Discount end date cannot be set without a discount price.");
+            }
+
+            // 🔖 הנחה
+            if (trip.DiscountPrice != null)
+            {
+                if (trip.DiscountPrice <= 0)
+                {
+                    ModelState.AddModelError("", "Discount price must be greater than zero.");
+                }
+                else if (trip.DiscountPrice >= trip.Price)
+                {
+                    ModelState.AddModelError("", "Discount price must be lower than regular price.");
+                }
+
+                if (trip.DiscountEndDate == null)
+                {
+                    ModelState.AddModelError("", "Discount end date is required.");
+                }
+                else
+                {
+                    if (trip.DiscountEndDate > DateTime.Today.AddDays(7))
+                    {
+                        ModelState.AddModelError("", "Discount can be active for up to 7 days only.");
+                    }
+
+                    if (trip.DiscountEndDate > trip.EndDate)
+                    {
+                        ModelState.AddModelError("",
+                            "Discount end date cannot be after the trip end date.");
+                    }
+                }
+            }
+
+            if (!ModelState.IsValid)
+                return View(trip);
+
+            _context.Trips.Add(trip);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+
+
+        public IActionResult ToggleVisibility(int id)
+        {
+            var trip = _context.Trips.FirstOrDefault(t => t.TripId == id);
+            if (trip == null)
+                return NotFound();
+
+            trip.IsVisible = !trip.IsVisible;
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Edit(int id)
+        {
+            var trip = _context.Trips.FirstOrDefault(t => t.TripId == id);
+            if (trip == null)
+                return NotFound();
+
+            return View(trip);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Trip trip)
+        {
+            var existingTrip = _context.Trips
+                .Include(t => t.Bookings)
+                .FirstOrDefault(t => t.TripId == trip.TripId);
+
+            if (existingTrip == null)
+                return NotFound();
+            int oldAvailableRooms = existingTrip.AvailableRooms;
+
+
+            // 🚫 אם יש הזמנות – אסור לשנות תאריכים
+            if (existingTrip.Bookings.Any())
+            {
+                if (trip.StartDate != existingTrip.StartDate ||
+                    trip.EndDate != existingTrip.EndDate)
+                {
+                    ModelState.AddModelError("",
+                        "Cannot change trip dates because there are existing bookings.");
+                }
+            }
+
+            // 🗓 תאריכי טיול
+            if (trip.StartDate < DateTime.Today)
+            {
+                ModelState.AddModelError("", "Trip start date cannot be in the past.");
+            }
+
+            if (trip.StartDate >= trip.EndDate)
+            {
+                ModelState.AddModelError("", "Start date must be before end date.");
+            }
+
+            // 💰 מחיר
+            if (trip.Price <= 0)
+            {
+                ModelState.AddModelError("", "Price must be greater than zero.");
+            }
+
+            // 🏨 חדרים
+            if (trip.AvailableRooms <= 0)
+            {
+                ModelState.AddModelError("", "Available rooms must be greater than zero.");
+            }
+
+            // 🎂 גיל
+            if (trip.AgeLimit < 0)
+            {
+                ModelState.AddModelError("", "Age limit cannot be negative.");
+            }
+
+            // ❌ תאריך הנחה בלי מחיר
+            if (trip.DiscountPrice == null && trip.DiscountEndDate != null)
+            {
+                ModelState.AddModelError("",
+                    "Discount end date cannot be set without a discount price.");
+            }
+
+            // 🔖 הנחה
+            if (trip.DiscountPrice != null)
+            {
+                if (trip.DiscountPrice <= 0)
+                {
+                    ModelState.AddModelError("", "Discount price must be greater than zero.");
+                }
+                else if (trip.DiscountPrice >= trip.Price)
+                {
+                    ModelState.AddModelError("", "Discount price must be lower than regular price.");
+                }
+
+                if (trip.DiscountEndDate == null)
+                {
+                    ModelState.AddModelError("", "Discount end date is required.");
+                }
+                else
+                {
+                    if (trip.DiscountEndDate > DateTime.Today.AddDays(7))
+                    {
+                        ModelState.AddModelError("", "Discount can be active for up to 7 days only.");
+                    }
+
+                    if (trip.DiscountEndDate > trip.EndDate)
+                    {
+                        ModelState.AddModelError("",
+                            "Discount end date cannot be after the trip end date.");
+                    }
+                }
+            }
+
+            if (!ModelState.IsValid)
+                return View(trip);
+
+            // ✅ עדכון בטוח
+            existingTrip.Destination = trip.Destination;
+            existingTrip.Country = trip.Country;
+            existingTrip.Description = trip.Description;
+            existingTrip.PackageType = trip.PackageType;
+
+            existingTrip.Price = trip.Price;
+            existingTrip.AvailableRooms = trip.AvailableRooms;
+            existingTrip.AgeLimit = trip.AgeLimit;
+            existingTrip.DiscountPrice = trip.DiscountPrice;
+            existingTrip.DiscountEndDate = trip.DiscountEndDate;
+            existingTrip.IsVisible = trip.IsVisible;
+            existingTrip.ImageUrl = trip.ImageUrl;
+
+            // תאריכים – רק אם אין הזמנות
+            if (!existingTrip.Bookings.Any())
+            {
+                existingTrip.StartDate = trip.StartDate;
+                existingTrip.EndDate = trip.EndDate;
+            }
+
+            _context.SaveChanges();
+            // ✅ אם נוספו חדרים – לקדם Waiting List
+            if (trip.AvailableRooms > oldAvailableRooms)
+            {
+                PromoteWaitingList(existingTrip.TripId);
+            }
+
+
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Delete(int id)
+        {
+            var trip = _context.Trips
+                .Include(t => t.Bookings)
+                .FirstOrDefault(t => t.TripId == id);
+
+            if (trip == null)
+                return NotFound();
+
+            if (trip.Bookings.Any())
+            {
+                return RedirectToAction("Index", new { error = "CannotDelete" });
+            }
+
+            _context.Trips.Remove(trip);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+
+        private void PromoteWaitingList(int tripId)
+        {
+
+            var trip = _context.Trips.First(t => t.TripId == tripId);
+
+            int bookedRooms = _context.Bookings
+            .Where(b =>
+            b.TripId == tripId &&
+            (
+            b.Status == BookingStatus.Paid ||
+            (b.Status == BookingStatus.Booked && b.IsFromWaitingList)
+            )
+            )
+            .Sum(b => b.Rooms);
+
+
+            int availableRooms = trip.AvailableRooms - bookedRooms;
+
+            // ⬅️ טוענים פעם אחת FIFO
+            var waitingQueue = _context.WaitingList
+                .Where(w => w.TripId == tripId)
+                .OrderBy(w => w.CreatedAt)
+                .ToList();
+
+            foreach (var w in waitingQueue)
+            {
+                if (availableRooms <= 0)
+                    break;
+
+                // FIFO אמיתי – לא מדלגים
+                if (w.RoomsRequested > availableRooms)
+                    break;
+
+                var booking = new Booking
+                {
+                    TripId = tripId,
+                    UserId = w.UserId,
+                    Rooms = w.RoomsRequested,
+                    BookingDate = DateTime.Now,
+                    Status = BookingStatus.Booked,
+                    IsFromWaitingList = true,
+                    PromotedAt = DateTime.Now
+                };
+
+                _context.Bookings.Add(booking);
+                _context.WaitingList.Remove(w);
+
+                availableRooms -= w.RoomsRequested;
+
+                // 📧 מייל
+                var user = _context.Users.FirstOrDefault(u => u.UserId == w.UserId);
+                if (user != null && !string.IsNullOrEmpty(user.Email))
+                {
+                    _emailService.SendWaitingListPromotionEmail(user.Email, trip);
+                }
+            }
+
+            _context.SaveChanges();
+        }
+        public IActionResult WaitingListPartial(int id)
+        {
+            var waitingList = _context.WaitingList
+                .Where(w => w.TripId == id)
+                .OrderBy(w => w.CreatedAt)
+                .Include(w => w.User)
+                .ToList();
+
+            ViewBag.TripId = id;
+            return PartialView("_WaitingListPartial", waitingList);
+        }
+
+
+        [HttpPost]
+        public IActionResult RemoveFromWaitingList(int waitingListId)
+        {
+            var entry = _context.WaitingList
+                .FirstOrDefault(w => w.WaitingListId == waitingListId);
+
+            if (entry == null)
+                return NotFound();
+
+            _context.WaitingList.Remove(entry);
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+
+
+    }
+}
