@@ -3,18 +3,23 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using TravelAgency_Secure.Data;
 using TravelAgency_Secure.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace TravelAgency_Secure.Services
 {
+       
     public class AutoCancelService
     {
         private readonly ApplicationDbContext _context;
         private readonly EmailService _emailService;
+        private readonly IConfiguration _config;
 
-        public AutoCancelService(ApplicationDbContext context)
+        public AutoCancelService(ApplicationDbContext context, IConfiguration config)
         {
-            _context = context;
-            _emailService = new EmailService();
+            _context = context;            
+            _config = config;
+            _emailService = new EmailService(_config);
+            
         }
 
         public void Run()

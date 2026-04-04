@@ -1,5 +1,4 @@
 C:\Users\messi\Documents\year3\semester b\אבטחת נתונים\Travel_Agency_Service_SHA_256\Travel_Agency_Service\bin\Debug\net8.0\appsettings.Development.json
-C:\Users\messi\Documents\year3\semester b\אבטחת נתונים\Travel_Agency_Service_SHA_256\Travel_Agency_Service\bin\Debug\net8.0\appsettings.json
 C:\Users\messi\Documents\year3\semester b\אבטחת נתונים\Travel_Agency_Service_SHA_256\Travel_Agency_Service\bin\Debug\net8.0\TravelAgency_Secure.staticwebassets.runtime.json
 C:\Users\messi\Documents\year3\semester b\אבטחת נתונים\Travel_Agency_Service_SHA_256\Travel_Agency_Service\bin\Debug\net8.0\TravelAgency_Secure.staticwebassets.endpoints.json
 C:\Users\messi\Documents\year3\semester b\אבטחת נתונים\Travel_Agency_Service_SHA_256\Travel_Agency_Service\bin\Debug\net8.0\LatoFont\Lato-Black.ttf
@@ -186,3 +185,4 @@ C:\Users\messi\Documents\year3\semester b\אבטחת נתונים\Travel_Agency_
 C:\Users\messi\Documents\year3\semester b\אבטחת נתונים\Travel_Agency_Service_SHA_256\Travel_Agency_Service\obj\Debug\net8.0\TravelAgency_Secure.pdb
 C:\Users\messi\Documents\year3\semester b\אבטחת נתונים\Travel_Agency_Service_SHA_256\Travel_Agency_Service\obj\Debug\net8.0\TravelAgency_Secure.genruntimeconfig.cache
 C:\Users\messi\Documents\year3\semester b\אבטחת נתונים\Travel_Agency_Service_SHA_256\Travel_Agency_Service\obj\Debug\net8.0\ref\TravelAgency_Secure.dll
+C:\Users\messi\Documents\year3\semester b\אבטחת נתונים\Travel_Agency_Service_SHA_256\Travel_Agency_Service\bin\Debug\net8.0\appsettings.json

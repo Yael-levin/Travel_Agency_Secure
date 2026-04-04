@@ -11,10 +11,13 @@ namespace TravelAgency_Secure.Controllers
     public class PaymentsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _config;
 
-        public PaymentsController(ApplicationDbContext context)
+    
+        public PaymentsController(ApplicationDbContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;
         }
 
         // GET: Payments/Pay/5
@@ -171,7 +174,7 @@ namespace TravelAgency_Secure.Controllers
             if (!string.IsNullOrEmpty(email))
             {
                 var pdfService = new PdfService();
-                var emailService = new EmailService();
+                var emailService = new EmailService(_config);
 
 
                 byte[] paymentPdf = pdfService.GeneratePaymentPdf(payment);

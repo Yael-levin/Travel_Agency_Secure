@@ -3,20 +3,21 @@ using TravelAgency_Secure.Data;
 using TravelAgency_Secure.Services;
 using System;
 using System.Linq;
-
+using Microsoft.Extensions.Configuration;
 public class SystemMaintenanceFilter : IActionFilter
 {
     private readonly ApplicationDbContext _context;
-
-    public SystemMaintenanceFilter(ApplicationDbContext context)
+    private readonly IConfiguration _config;
+    public SystemMaintenanceFilter(ApplicationDbContext context, IConfiguration config)
     {
         _context = context;
+        _config = config;
     }
 
     public void OnActionExecuting(ActionExecutingContext context)
     {
         // 1️⃣ Auto cancel להזמנות Waiting List
-        var autoCancelService = new AutoCancelService(_context);
+        var autoCancelService = new AutoCancelService(_context, _config);
         autoCancelService.Run();
 
         // 2️⃣ פקיעת הנחות

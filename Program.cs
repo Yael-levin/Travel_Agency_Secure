@@ -18,7 +18,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
+        "Server=localhost\\SQLEXPRESS;Database=TravelSecurityDB;Trusted_Connection=True;TrustServerCertificate=True"
     )
 );
 builder.Services.AddControllersWithViews(options =>

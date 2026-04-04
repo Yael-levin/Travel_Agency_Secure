@@ -14,7 +14,8 @@ namespace TravelAgency_Secure.Controllers
 
         public UsersController(IConfiguration config, TravelAgency_Secure.Services.EmailService emailService)
         {
-            _connStr = config.GetConnectionString("DefaultConnection");
+            //_connStr = config.GetConnectionString("DefaultConnection");
+            _connStr = "Server=localhost\\SQLEXPRESS;Database=TravelSecurityDB;Trusted_Connection=True;TrustServerCertificate=True";
             _emailService = emailService;
         }
 
