@@ -1,11 +1,19 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using TravelAgency_Secure.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace TravelAgency_Secure.Services
 {
     public class EmailService
     {
+        private readonly IConfiguration _config;
+
+        public EmailService(IConfiguration config)
+        {
+            _config = config;
+        }
+
         // =========================
         // 💳 PAYMENT CONFIRMATION
         // =========================
@@ -90,7 +98,7 @@ namespace TravelAgency_Secure.Services
 
             var mail = new MailMessage
             {
-                From = new MailAddress("sceyael@gmail.com", "Travel Agency | No Reply"),
+                From = new MailAddress(_config["EmailSettings:Email"], "Travel Agency | No Reply"),
                 Subject = subject,
                 Body = body,
                 IsBodyHtml = true
@@ -206,7 +214,7 @@ namespace TravelAgency_Secure.Services
 
             var mail = new MailMessage
             {
-                From = new MailAddress("sceyael@gmail.com", "Travel Agency | No Reply"),
+                From = new MailAddress(_config["EmailSettings:Email"], "Travel Agency | No Reply"),
                 Subject = subject,
                 Body = body,
                 IsBodyHtml = true
@@ -220,16 +228,16 @@ namespace TravelAgency_Secure.Services
         // =========================
         // 🔧 SHARED SMTP CREATION
         // =========================
-        private SmtpClient CreateSmtpClient()
+       private SmtpClient CreateSmtpClient()
         {
+            string email = _config["EmailSettings:Email"];
+            string password = _config["EmailSettings:Password"];
+
             return new SmtpClient("smtp.gmail.com")
             {
                 Port = 587,
                 EnableSsl = true,
-                Credentials = new NetworkCredential(
-                    "sceyael@gmail.com",
-                    "chfbjdpuvpucaewa"
-                )
+                Credentials = new NetworkCredential(email, password)
             };
         }
 
@@ -320,7 +328,7 @@ namespace TravelAgency_Secure.Services
 
             var mail = new MailMessage
             {
-                From = new MailAddress("sceyael@gmail.com", "Travel Agency | No Reply"),
+                From = new MailAddress(_config["EmailSettings:Email"], "Travel Agency | No Reply"),
                 Subject = subject,
                 Body = body,
                 IsBodyHtml = true
@@ -413,7 +421,7 @@ namespace TravelAgency_Secure.Services
 
             var mail = new MailMessage
             {
-                From = new MailAddress("sceyael@gmail.com", "Travel Agency | No Reply"),
+                From = new MailAddress(_config["EmailSettings:Email"], "Travel Agency | No Reply"),
                 Subject = subject,
                 Body = body,
                 IsBodyHtml = true
@@ -508,7 +516,7 @@ namespace TravelAgency_Secure.Services
 
             var mail = new MailMessage
             {
-                From = new MailAddress("sceyael@gmail.com", "Travel Agency | No Reply"),
+                From = new MailAddress(_config["EmailSettings:Email"], "Travel Agency | No Reply"),
                 Subject = subject,
                 Body = body,
                 IsBodyHtml = true
@@ -558,7 +566,7 @@ namespace TravelAgency_Secure.Services
 
             var mail = new MailMessage
             {
-                From = new MailAddress("sceyael@gmail.com", "Travel Agency | Security"),
+                From = new MailAddress(_config["EmailSettings:Email"], "Travel Agency | Security"),
                 Subject = subject,
                 Body = body,
                 IsBodyHtml = true

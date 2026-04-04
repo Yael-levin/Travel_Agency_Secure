@@ -81,6 +81,9 @@ namespace TravelAgency_Secure.Controllers
             return View();
         }
 
+        //
+        // RELEVANT PART !!
+        //
         // GET: Users/ForgotPassword
        
         public IActionResult ForgotPassword()
