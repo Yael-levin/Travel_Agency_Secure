@@ -210,13 +210,13 @@ namespace TravelAgency_Secure.Controllers
                 return View();
             }
             
-            if (!Regex.IsMatch(firstName, @"^[A-Za-zא-ת]+$"))
+            if (!Regex.IsMatch(firstName, @"^[A-Za-zא-ת ]+$"))
             {
                 ViewBag.Error = "First name must contain only letters";
                 return View();
             }
 
-            if (!Regex.IsMatch(lastName, @"^[A-Za-zא-ת]+$"))
+            if (!Regex.IsMatch(lastName, @"^[A-Za-zא-ת ]+$"))
             {
                 ViewBag.Error = "Last name must contain only letters";
                 return View();

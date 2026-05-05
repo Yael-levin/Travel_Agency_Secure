@@ -8,7 +8,7 @@
 
             <div class="mb-3">
                 <label class="form-label">Full Name</label>
-                <input type="text" name="fullName" class="form-control" required />
+                <input type="text" name="fullName" id="fullName" class="form-control" required />
             </div>
 
             <div class="mb-3">
@@ -43,19 +43,19 @@
 
             <div class="mb-3">
                 <label class="form-label">First Name</label>
-                <input type="text" name="firstName"
+                <input type="text" name="firstName" id="firstName"
                        class="form-control"
                        maxlength="30"
-                       oninput="this.value = this.value.replace(/[^a-zA-Zא-ת]/g, '')"
+                       oninput="this.value = this.value.replace(/[^a-zA-Zא-ת ]/g, '')"
                        required />
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Last Name</label>
-                <input type="text" name="lastName"
+                <input type="text" name="lastName" id="lastName"
                        class="form-control"
                        maxlength="30"
-                       oninput="this.value = this.value.replace(/[^a-zA-Zא-ת]/g, '')"
+                       oninput="this.value = this.value.replace(/[^a-zA-Zא-ת ]/g, '')"
                        required />
             </div>
 
@@ -134,4 +134,21 @@
             input.value = value;
         }
     }
+</script>
+
+<script>
+    document.getElementById("fullName").addEventListener("blur", function () {
+        const fullName = this.value.trim().replace(/\s+/g, " ");
+
+        if (!fullName.includes(" ")) {
+            return;
+        }
+
+        const firstSpaceIndex = fullName.indexOf(" ");
+        const first = fullName.substring(0, firstSpaceIndex);
+        const last = fullName.substring(firstSpaceIndex + 1);
+
+        document.getElementById("firstName").value = first;
+        document.getElementById("lastName").value = last;
+    });
 </script>

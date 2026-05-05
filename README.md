@@ -22,8 +22,17 @@ The Data Security classwork extends this existing system by focusing on:
 - SQL Injection vulnerabilities and data exposure (Classwork 2)
 
 ---
+## Technologies & Libraries
 
-## Data Security Class Work – Authentication Update
+### Required NuGet Packages
+
+- Microsoft.EntityFrameworkCore 8.0.0
+- Microsoft.EntityFrameworkCore.SqlServer 8.0.0
+- Microsoft.Data.SqlClient
+
+---
+
+## Data Security Class Work 1 – Authentication Update
 
 This project was adapted to meet the **Data Security** class work requirements for a secure login-based web application.
 
