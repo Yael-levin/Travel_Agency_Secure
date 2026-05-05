@@ -15,72 +15,86 @@
 <div class="admin-table-card">
     <table class="table table-hover align-middle admin-users-table table-card">
 
-        <thead>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>ID</th>
+            <th>Credit Card</th>
+            <th>Valid Date</th>
+            <th>CVC</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var u in Model)
+        {
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var u in Model)
-            {
-                <tr>
-                    <td>@u.FullName</td>
-                    <td>@u.Email</td>
-                    <td>@u.Role</td>
-                    <td>
-                        @if (u.IsActive)
+                <td>@u.FullName</td>
+                <td>@u.Email</td>
+                <td>@u.Role</td>
+                <td>
+                    @if (u.IsActive)
+                    {
+                        <span class="status-badge active">Active</span>
+                    }
+                    else
+                    {
+                        <span class="status-badge blocked">Blocked</span>
+                    }
+                </td>
+
+                <td>@u.FirstName</td>
+                <td>@u.LastName</td>
+                <td>@u.IDNumber</td>
+                <td>@u.CreditCardNumber</td>
+                <td>@u.ValidDate</td>
+                <td>@u.CVC</td>
+
+                <td>
+                    <div class="d-flex align-items-center gap-3">
+
+                        @if (u.Role != "Admin")
                         {
-                            <span class="status-badge active">Active</span>
-                        }
-                        else
-                        {
-                            <span class="status-badge blocked">Blocked</span>
-                        }
+                            <a asp-action="ToggleActive"
+                               asp-route-id="@u.UserId"
+                               class="text-warning"
+                               title="@(u.IsActive ? "Block user" : "Unblock user")">
+                                <span class="action-icon">
+                                    @(u.IsActive ? "🚫" : "✅")
+                                </span>
+                            </a>
 
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center gap-3">
-
-                            @if (u.Role != "Admin")
-                            {
-                               <a asp-action="ToggleActive"
-                                   asp-route-id="@u.UserId"
-                                   class="text-warning"
-                                   title="@(u.IsActive ? "Block user" : "Unblock user")">
-                                    <span class="action-icon">
-                                        @(u.IsActive ? "🚫" : "✅")
-                                    </span>
-                                </a>
-
-                                <button class="btn btn-link text-danger p-0"
-                                        title="Delete user"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteUserModal"
-                                        data-userid="@u.UserId"
-                                        data-username="@u.FullName">
-                                    <span class="action-icon">🗑️</span>
-                                </button>
-                            }
-
-                            <button class="btn btn-link text-info p-0"
-                                    title="Booking history"
+                            <button class="btn btn-link text-danger p-0"
+                                    title="Delete user"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#bookingHistoryModal"
+                                    data-bs-target="#deleteUserModal"
                                     data-userid="@u.UserId"
                                     data-username="@u.FullName">
-                                <span class="action-icon">📜</span>
+                                <span class="action-icon">🗑️</span>
                             </button>
+                        }
 
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                        <button class="btn btn-link text-info p-0"
+                                title="Booking history"
+                                data-bs-toggle="modal"
+                                data-bs-target="#bookingHistoryModal"
+                                data-userid="@u.UserId"
+                                data-username="@u.FullName">
+                            <span class="action-icon">📜</span>
+                        </button>
+
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 </div>
 
 

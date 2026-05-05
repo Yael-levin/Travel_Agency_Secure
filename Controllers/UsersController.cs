@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using System.ComponentModel.DataAnnotations;
 using TravelAgency_Secure.Helpers;
 using TravelAgency_Secure.Models;
+using System.Text.RegularExpressions;
 
 
 namespace TravelAgency_Secure.Controllers
@@ -179,9 +180,17 @@ namespace TravelAgency_Secure.Controllers
         //
         // POST: Users/Register
         [HttpPost]
-        public IActionResult Register(string fullName, string email, string password)
+        public IActionResult Register(string fullName, string email, string password, string firstName, string lastName, string idNumber, string creditCardNumber, string validDate, string cvc)
         {
-            if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(fullName) ||
+                string.IsNullOrWhiteSpace(email) ||
+                string.IsNullOrWhiteSpace(password) ||
+                string.IsNullOrWhiteSpace(firstName) ||
+                string.IsNullOrWhiteSpace(lastName) ||
+                string.IsNullOrWhiteSpace(idNumber) ||
+                string.IsNullOrWhiteSpace(creditCardNumber) ||
+                string.IsNullOrWhiteSpace(validDate) ||
+                string.IsNullOrWhiteSpace(cvc))
             {
                 ViewBag.Error = "All fields are required";
                 return View();
@@ -194,13 +203,68 @@ namespace TravelAgency_Secure.Controllers
                 return View();
             }
 
-            // בדיקת חוזק סיסמה (לפי הדרישות שלך)
+            // בדיקת חוזק סיסמה
             if (password.Length < 6 || !password.Any(char.IsUpper) || !password.Any(char.IsDigit))
             {
                 ViewBag.Error = "Password must be at least 6 characters, include an uppercase letter and a number";
                 return View();
             }
+            
+            if (!Regex.IsMatch(firstName, @"^[A-Za-zא-ת]+$"))
+            {
+                ViewBag.Error = "First name must contain only letters";
+                return View();
+            }
 
+            if (!Regex.IsMatch(lastName, @"^[A-Za-zא-ת]+$"))
+            {
+                ViewBag.Error = "Last name must contain only letters";
+                return View();
+            }
+
+            if (!Regex.IsMatch(idNumber, @"^\d{9}$"))
+            {
+                ViewBag.Error = "ID must be exactly 9 digits";
+                return View();
+            }
+
+            if (!Regex.IsMatch(creditCardNumber, @"^\d{4} \d{4} \d{4} \d{4}$"))
+            {
+                ViewBag.Error = "Credit card must be in format 1234 5678 9012 3456";
+                return View();
+            }
+
+            if (!Regex.IsMatch(validDate, @"^(0[1-9]|1[0-2])\/\d{2}$"))
+            {
+                ViewBag.Error = "Valid date must be in MM/YY format";
+                return View();
+            }
+
+           try
+            {
+                string[] dateParts = validDate.Split('/');
+                int month = int.Parse(dateParts[0]);
+                int year = 2000 + int.Parse(dateParts[1]);
+
+                DateTime now = DateTime.Now;
+
+                if (year < now.Year || (year == now.Year && month < now.Month))
+                {
+                    ViewBag.Error = "Credit card expiration date cannot be in the past";
+                    return View();
+                }
+            }
+            catch
+            {
+                ViewBag.Error = "Invalid expiration date";
+                return View();
+            }
+
+            if (!Regex.IsMatch(cvc, @"^\d{3}$"))
+            {
+                ViewBag.Error = "CVC must be exactly 3 digits";
+                return View();
+            }
             using SqlConnection con = new SqlConnection(_connStr);
             con.Open();
 
@@ -223,17 +287,60 @@ namespace TravelAgency_Secure.Controllers
 
             // הכנסה ל-DB כולל ה-Role הדינמי
             SqlCommand insertCmd = new SqlCommand(
-                @"INSERT INTO Users (FullName, Email, PasswordHash, Role, IsActive)
-                VALUES (@fullName, @email, @hash, @role, 1)", con);
+                @"INSERT INTO Users (FullName, Email, PasswordHash, Role, IsActive, FirstName, LastName, IDNumber, CreditCardNumber, ValidDate, CVC)
+                VALUES 
+                (@fullName, @email, @hash, @role, 1, @firstName, @lastName, @idNumber, @creditCardNumber, @validDate, @cvc)", con);
 
             insertCmd.Parameters.AddWithValue("@fullName", fullName);
             insertCmd.Parameters.AddWithValue("@email", email);
             insertCmd.Parameters.AddWithValue("@hash", hash);
             insertCmd.Parameters.AddWithValue("@role", assignedRole);
+            insertCmd.Parameters.AddWithValue("@firstName", firstName);
+            insertCmd.Parameters.AddWithValue("@lastName", lastName);
+            insertCmd.Parameters.AddWithValue("@idNumber", idNumber);
+            insertCmd.Parameters.AddWithValue("@creditCardNumber", creditCardNumber);
+            insertCmd.Parameters.AddWithValue("@validDate", validDate);
+            insertCmd.Parameters.AddWithValue("@cvc", cvc);
 
             insertCmd.ExecuteNonQuery();
 
             return RedirectToAction("Login");
+        }
+
+
+
+        // for sql injection - vulnerablr function - login
+        public IActionResult VulnerableLogin()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult VulnerableLogin(string email, string password)
+        {
+            using SqlConnection con = new SqlConnection(_connStr);
+
+            // !!קוד פגיע בכוונה
+            string hashedPassword = PasswordHelper.HashPassword(password);
+
+            string sql = "SELECT * FROM Users WHERE Email='" + email + "' AND PasswordHash='" + hashedPassword + "' AND IsActive=1";
+            SqlCommand cmd = new SqlCommand(sql, con);
+
+            con.Open();
+            var reader = cmd.ExecuteReader();
+
+            if (reader.Read())
+            {
+                HttpContext.Session.SetString("UserName", reader["FullName"].ToString());
+                HttpContext.Session.SetString("Role", reader["Role"].ToString());
+                HttpContext.Session.SetInt32("UserId", (int)reader["UserId"]);
+                HttpContext.Session.SetString("UserEmail", reader["Email"].ToString());
+
+                return RedirectToAction("Trips", "Trips");
+            }
+
+            ViewBag.Error = "Invalid login";
+            return View();
         }
 
 

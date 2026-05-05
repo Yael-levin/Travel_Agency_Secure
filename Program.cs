@@ -31,6 +31,8 @@ builder.Services.AddScoped<EmailService>();
 
 var app = builder.Build();
 
+DatabaseInitializer.Initialize();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

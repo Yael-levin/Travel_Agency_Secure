@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TravelAgency_Secure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4b0288be280693530260afa7fc30747ea832f1a8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be46869cc45460bddbc3eb9d810631a245c76e33")]
 [assembly: System.Reflection.AssemblyProductAttribute("TravelAgency_Secure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TravelAgency_Secure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

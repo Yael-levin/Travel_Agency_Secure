@@ -8,35 +8,23 @@
 
             <div class="mb-3">
                 <label class="form-label">Full Name</label>
-                <input type="text"
-                       name="fullName"
-                       class="form-control"
-                       required />
+                <input type="text" name="fullName" class="form-control" required />
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Email</label>
-                <input type="email"
-                       name="email"
-                       id="emailInput"
-                       autocomplete="email"
-                       class="form-control"
-                       required />
+                <input type="email" name="email" id="emailInput"
+                       autocomplete="email" class="form-control" required />
             </div>
 
             <div class="mb-2">
                 <label class="form-label">Password</label>
-
                 <div class="input-group">
-                    <input type="password"
-                           name="password"
-                           id="password"
+                    <input type="password" name="password" id="password"
                            class="form-control password-field"
-                           minlength="6"
-                           required />
+                           minlength="6" required />
 
-                    <button type="button"
-                            class="btn btn-outline-secondary toggle-password">
+                    <button type="button" class="btn btn-outline-secondary toggle-password">
                         👁️
                     </button>
                 </div>
@@ -45,6 +33,75 @@
             <small id="passwordHint" class="text-danger d-none">
                 Password must be at least 6 characters and include letters and numbers
             </small>
+
+            <hr class="my-4" />
+
+            <h5 class="text-primary mb-3">Saved Credit Card Details</h5>
+            <p class="text-muted small">
+                These details are saved in the database for Classwork 2 demonstration.
+            </p>
+
+            <div class="mb-3">
+                <label class="form-label">First Name</label>
+                <input type="text" name="firstName"
+                       class="form-control"
+                       maxlength="30"
+                       oninput="this.value = this.value.replace(/[^a-zA-Zא-ת]/g, '')"
+                       required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="lastName"
+                       class="form-control"
+                       maxlength="30"
+                       oninput="this.value = this.value.replace(/[^a-zA-Zא-ת]/g, '')"
+                       required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">ID Number</label>
+                <input type="text" name="idNumber"
+                       class="form-control"
+                       maxlength="9"
+                       inputmode="numeric"
+                       placeholder="123456789"
+                       oninput="this.value=this.value.replace(/\D/g,'')"
+                       required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Credit Card Number</label>
+                <input type="text" name="creditCardNumber"
+                       class="form-control"
+                       maxlength="19"
+                       placeholder="1234 5678 9012 3456"
+                       inputmode="numeric"
+                       oninput="formatCardNumber(this)"
+                       required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Valid Date</label>
+                <input type="text" name="validDate"
+                       class="form-control"
+                       placeholder="MM/YY"
+                       maxlength="5"
+                       inputmode="numeric"
+                       oninput="formatExpiry(this)"
+                       required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">CVC</label>
+                <input type="text" name="cvc"
+                       class="form-control"
+                       maxlength="3"
+                       inputmode="numeric"
+                       placeholder="123"
+                       oninput="this.value=this.value.replace(/\D/g,'')"
+                       required />
+            </div>
 
             @if (ViewBag.Error != null)
             {
@@ -61,3 +118,20 @@
 </div>
 
 <script src="~/js/email_autocomplete.js"></script>
+
+<script>
+    function formatCardNumber(input) {
+        let value = input.value.replace(/\D/g, '').substring(0, 16);
+        let formatted = value.match(/.{1,4}/g);
+        input.value = formatted ? formatted.join(' ') : '';
+    }
+
+    function formatExpiry(input) {
+        let value = input.value.replace(/\D/g, '').substring(0, 4);
+        if (value.length >= 3) {
+            input.value = value.substring(0, 2) + '/' + value.substring(2);
+        } else {
+            input.value = value;
+        }
+    }
+</script>

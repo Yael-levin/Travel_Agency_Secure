@@ -45,6 +45,15 @@
             <button type="submit" class="btn btn-primary w-100 mt-2">
                 Login
             </button>
+
+            <div class="d-grid mt-3">
+                <a asp-action="VulnerableLogin"
+                asp-controller="Users"
+                class="btn btn-outline-danger">
+                    SQL Injection Demo Login
+                </a>
+            </div>
+            
             <div class="text-center mt-3">
                 <a asp-action="ForgotPassword" asp-controller="Users" class="text-decoration-none">Forgot the password?</a>
             </div>
