@@ -155,3 +155,11 @@ This demonstrates how insecure SQL queries can:
 - Expose sensitive user data
 
 ---
+
+## Notes – Git Configuration Issue
+
+During development, an issue was encountered where Git did not recognize the `.gitignore` file due to incorrect file encoding (UTF-16 on Windows).
+
+This was resolved by saving the `.gitignore` file using ASCII encoding and resetting the Git index to reapply ignore rules.
+
+As a result, sensitive files such as `appsettings.json` and build directories (`bin`, `obj`) were successfully excluded from version control.
