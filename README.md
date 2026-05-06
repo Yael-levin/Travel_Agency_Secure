@@ -122,19 +122,41 @@ This login builds SQL queries using string concatenation, making it vulnerable t
 
 ### SQL Injection Attacks
 
-Two different attacks were demonstrated:
+Four different SQL Injection attacks were demonstrated:
+
+#### Attacks via Email / Username field
 
 1. Authentication Bypass  
-Email: ' OR 1=1 --  
+Email: `' OR 1=1--`  
 Password: anything  
 This attack forces the SQL condition to always be true, allowing login without valid credentials (usually as the first user – Admin).
 
 2. Login as Specific Admin (commenting password check)  
-Email: yaellevin1@gmail.com' --  
+Email: `yaellevin1@gmail.com' --`  
 Password: anything  
 This attack closes the email string and comments out the password check, allowing login as a specific Admin user without knowing the password.
 
 ---
+
+#### Attacks via Password field (with SHA256 inside SQL)
+
+In this implementation, the password is hashed using SHA256 inside the SQL query.  
+Therefore, the payload must first break out of the hash function before injecting SQL.
+
+3. Authentication Bypass via Password  
+Email: anything@gmail.com  
+Password: `x'), 2)) OR 1=1--`  
+This payload breaks out of the hash function and injects a condition that is always true, bypassing authentication.
+
+4. Login as Specific Admin via Password  
+Email: anything@gmail.com  
+Password: `x'), 2)) OR (1=1 AND Email='yaellevin1@gmail.com')--`  
+This attack injects a condition targeting a specific Admin user, allowing login without knowing the password.
+
+
+These attacks were demonstrated only in the intentionally vulnerable `VulnerableLogin` endpoint, while the regular login remains secure using proper hashing and parameterized queries.
+---
+
 
 ### Data Exposure
 

@@ -321,9 +321,7 @@ namespace TravelAgency_Secure.Controllers
             using SqlConnection con = new SqlConnection(_connStr);
 
             // !!קוד פגיע בכוונה
-            string hashedPassword = PasswordHelper.HashPassword(password);
-
-            string sql = "SELECT * FROM Users WHERE Email='" + email + "' AND PasswordHash='" + hashedPassword + "' AND IsActive=1";
+            string sql = "SELECT * FROM Users WHERE Email='" + email + "' AND PasswordHash=LOWER(CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', '" + password + "'), 2)) AND IsActive=1";
             SqlCommand cmd = new SqlCommand(sql, con);
 
             con.Open();
