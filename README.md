@@ -178,6 +178,54 @@ This demonstrates how insecure SQL queries can:
 
 ---
 
+## Data Security – Classwork 3
+
+This part focuses on SQL Injection mitigation and explains why the regular login system remains protected against SQL Injection attacks, while the intentionally vulnerable login is kept only for demonstration purposes.
+
+### Secure Login Protection
+
+Unlike the `VulnerableLogin` endpoint, the regular `Login` method uses secure mechanisms to prevent SQL Injection attacks.
+
+The implemented protections include:
+
+- Parameterized Queries (`@email`)
+- Prevention of string concatenation inside SQL queries
+- Password verification outside the SQL query itself
+- SHA-256 password hashing
+- Input validation for email addresses
+
+The secure login retrieves the user using a parameterized SQL query:
+
+```csharp
+string sql = "SELECT * FROM Users WHERE Email=@email AND IsActive=1";
+cmd.Parameters.AddWithValue("@email", email);
+```
+
+Because the user input is passed as a parameter, malicious SQL payloads are treated as plain text and cannot modify the structure of the SQL query.
+
+In addition, the password itself is not included directly in the SQL statement.  
+The system first retrieves the user record and then verifies the password hash using:
+
+```csharp
+PasswordHelper.VerifyPassword(...)
+```
+
+This separation prevents attackers from manipulating the password field in order to alter SQL query logic.
+
+### Additional Validation
+
+The login system also includes email validation and automatic email completion for invalid or incomplete email input.
+
+These mechanisms improve input validation and reduce the chance of malformed user input reaching the system.
+
+### Relation Between the Classworks
+
+- Classwork 1 focused on secure authentication mechanisms, SHA-256 hashing, password recovery, and email verification.
+- Classwork 2 demonstrated SQL Injection vulnerabilities through an intentionally insecure login endpoint.
+- Classwork 3 explains how the secure login implementation prevents those attacks in practice.
+
+---
+
 ## Notes – Git Configuration Issue
 
 During development, an issue was encountered where Git did not recognize the `.gitignore` file due to incorrect file encoding (UTF-16 on Windows).

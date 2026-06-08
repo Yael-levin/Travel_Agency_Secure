@@ -25,6 +25,8 @@ namespace TravelAgency_Secure.Controllers
             return View();
         }
 
+        // Secure login: the user input is passed as a SQL parameter,
+        // so malicious input is treated as text and cannot change the SQL query.           
         [HttpPost]
         public IActionResult Login(string email, string password)
         {
