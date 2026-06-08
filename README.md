@@ -153,8 +153,9 @@ Email: anything@gmail.com
 Password: `x'), 2)) OR (1=1 AND Email='yaellevin1@gmail.com')--`  
 This attack injects a condition targeting a specific Admin user, allowing login without knowing the password.
 
+---
 
-These attacks were demonstrated only in the intentionally vulnerable `VulnerableLogin` endpoint, while the regular login remains secure using proper hashing and parameterized queries.
+#### These attacks were demonstrated only in the intentionally vulnerable `VulnerableLogin` endpoint, while the regular login remains secure using proper hashing and parameterized queries.
 ---
 
 
